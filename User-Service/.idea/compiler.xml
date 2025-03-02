@@ -9,24 +9,19 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
         <module name="adminserver" />
-        <module name="notificationservice" />
+        <module name="postservice" />
+        <module name="configServer" />
         <module name="userservice" />
-      </profile>
-      <profile name="Annotation profile for eurekaServer" enabled="true">
-        <sourceOutputDir name="../eurekaServer/target/generated-sources/annotations" />
-        <sourceTestOutputDir name="../eurekaServer/target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
         <module name="eurekaServer" />
+        <module name="notificationservice" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="postservice" target="17" />
-    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="adminserver" options="-parameters" />
       <module name="apigateway" options="-parameters" />
+      <module name="configServer" options="-parameters" />
       <module name="eurekaServer" options="-parameters" />
       <module name="notificationservice" options="-parameters" />
       <module name="postservice" options="-parameters" />
