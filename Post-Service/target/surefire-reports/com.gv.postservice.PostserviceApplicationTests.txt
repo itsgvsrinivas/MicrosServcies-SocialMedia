@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.gv.postservice.PostserviceApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.041 s -- in com.gv.postservice.PostserviceApplicationTests
