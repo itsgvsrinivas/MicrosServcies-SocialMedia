@@ -17,7 +17,7 @@ import java.util.Set;
 public class AppFilter implements GlobalFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        log.info("[filter]");
+        log.info("[AppFilter] >> [filter]");
 
         //Validate the requests
         ServerHttpRequest serverHttpRequest = exchange.getRequest();
