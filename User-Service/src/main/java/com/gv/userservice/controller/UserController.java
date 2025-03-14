@@ -1,18 +1,24 @@
 package com.gv.userservice.controller;
 
+import com.gv.userservice.configuration.AppConfig;
+import com.gv.userservice.configuration.KafkaConfiguration;
+import com.gv.userservice.configuration.MailConfig;
+import com.gv.userservice.configuration.WebClientConfig;
+import com.gv.userservice.dto.request.CreateUserRequest;
 import com.gv.userservice.dto.response.APIResponse;
+import com.gv.userservice.dto.response.Error;
 import com.gv.userservice.exception.NoUserFoundException;
 import com.gv.userservice.model.Notification;
 import com.gv.userservice.model.Post;
 import com.gv.userservice.model.User;
 import com.gv.userservice.service.UserService;
 import com.gv.userservice.util.APIUtils;
+import com.gv.userservice.util.ObjectsValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -30,16 +36,32 @@ public class UserController {
     private final String NOTIFICATION_URL_SERVICE_NAME_ID = "http://NOTIFICATION-SERVICE/api/v1/notifications/";
 
     private final RestTemplate restTemplate;
-    private UserService userService;
+    private final UserService userService;
+    private final MailConfig mailConfig;
+    private final WebClientConfig webClientConfig;
+    private final KafkaConfiguration kafkaConfiguration;
+    private final AppConfig appConfig;
 
-    public UserController(RestTemplate restTemplate, UserService userService) {
+
+    private final ObjectsValidator<CreateUserRequest> createUserRequestObjectsValidator;
+
+    public UserController(RestTemplate restTemplate, UserService userService, MailConfig mailConfig, WebClientConfig webClientConfig, KafkaConfiguration kafkaConfiguration, AppConfig appConfig, ObjectsValidator<CreateUserRequest> createUserRequestObjectsValidator) {
         this.restTemplate = restTemplate;
         this.userService = userService;
+        this.mailConfig = mailConfig;
+        this.webClientConfig = webClientConfig;
+        this.kafkaConfiguration = kafkaConfiguration;
+        this.appConfig = appConfig;
+        this.createUserRequestObjectsValidator = createUserRequestObjectsValidator;
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<APIResponse> getUser(@PathVariable("id") Long id) {
         log.info("[getUser] id:" + id);
+        log.info("[getUser] appConfig Info:" + appConfig.toString());
+        log.info("[getUser] mail Info:" + mailConfig.toString());
+        log.info("[getUser] webClient Info:" + webClientConfig.toString());
+        log.info("[getUser] kafkaConfiguration Info:" + kafkaConfiguration.toString());
         Long userId = Long.valueOf(id);
 
         Post post = restTemplate.getForObject(POST_URL_DIRECT_ID + id, Post.class);
@@ -98,6 +120,22 @@ public class UserController {
         list.add(user2);
         APIResponse apiResponse = APIUtils.createApiResponse("0000", "Successful", list, null);
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @PostMapping("")
+    public ResponseEntity<APIResponse> createUser(@RequestBody CreateUserRequest createUserRequest) {
+        log.info("[createUser]" + createUserRequest.toString());
+        var violations = createUserRequestObjectsValidator.validate(createUserRequest);
+        APIResponse apiResponse;
+        //validate
+        if (!violations.isEmpty()) {
+            String errMsg = String.join("\n", violations);
+            apiResponse = APIUtils.createApiResponse("9999", "UnSuccessful", null, Error.builder().code("9999").message(errMsg).build());
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        } else {
+            apiResponse = APIUtils.createApiResponse("0000", "Successful", "Success", null);
+            return ResponseEntity.ok(apiResponse);
+        }
 
     }
 }
