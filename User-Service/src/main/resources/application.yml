@@ -17,8 +17,13 @@ eureka:
       defaultZone: http://localhost:8999/eureka/
 app:
   version: 1.0
+
 management:
   endpoints:
     web:
       exposure:
         include: '*'
+
+springdoc:
+  api-docs:
+    path=: /api-docs

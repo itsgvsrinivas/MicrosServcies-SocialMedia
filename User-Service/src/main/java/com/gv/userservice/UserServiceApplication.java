@@ -17,6 +17,8 @@ public class UserServiceApplication {
     public static void main(String[] args) {
         System.out.println("[UserServiceApplication] [main+++]");
         SpringApplication.run(UserServiceApplication.class, args);
+
+        //http://localhost:8081/swagger-ui/index.html
     }
 
     @Bean
